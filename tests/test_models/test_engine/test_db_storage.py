@@ -68,6 +68,37 @@ class TestDBStorage(unittest.TestCase):
         self.assertEqual(test_state.id, t_s_db.id)
         self.assertEqual(test_state.name, t_s_db.name)
 
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self):
+        """Test get method for all class with id with storage"""
+        models.storage.reload()
+        self.assertTrue(models.storage.get.__doc__ is not None)
+        test_state_info = {"name": "Mokattam"}
+        test_state = State(**test_state_info)
+        models.storage.new(test_state)
+        models.storage.save()
+        t_s_db = models.storage.get(State, test_state.id)
+        self.assertEqual(test_state.id, t_s_db.id)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """Test count method for all classes and for one cls"""
+        models.storage.reload()
+        self.assertTrue(models.storage.count.__doc__ is not None)
+        test_state_info = {"name": "Mokattam"}
+        test_state = State(**test_state_info)
+        models.storage.new(test_state)
+        test_city_info = {"name": "Nasr", "state_id": test_state.id}
+        test_city = City(**test_city_info)
+        models.storage.new(test_city)
+        models.storage.save()
+
+        test_state_count = models.storage.count(State)
+        self.assertEqual(test_state_count, len(models.storage.all(State)))
+
+        test_all_count = models.storage.count()
+        self.assertEqual(test_all_count, len(models.storage.all()))
+
 
 class TestDBStorageDocs(unittest.TestCase):
     """Tests to check the documentation and style of DBStorage class"""

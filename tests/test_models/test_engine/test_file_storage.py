@@ -113,3 +113,36 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get(self):
+        """Test get method for all class with id with storage"""
+        test_storage = FileStorage()
+        test_storage.reload()
+        self.assertTrue(test_storage.get.__doc__ is not None)
+        test_state_info = {"name": "Mokattam"}
+        test_state = State(**test_state_info)
+        test_storage.new(test_state)
+        test_storage.save()
+        test_state_DB = test_storage.get(State, test_state.id)
+        self.assertEqual(test_state, test_state_DB)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count(self):
+        """Test count method for all classes and for one cls"""
+        test_storage = FileStorage()
+        test_storage.reload()
+        self.assertTrue(test_storage.count.__doc__ is not None)
+        test_state_info = {"name": "Mokattam"}
+        test_state = State(**test_state_info)
+        test_storage.new(test_state)
+        test_city_info = {"name": "Nasr", "state_id": test_state.id}
+        test_city = City(**test_city_info)
+        test_storage.new(test_city)
+        test_storage.save()
+
+        test_state_count = test_storage.count(State)
+        self.assertEqual(test_state_count, len(test_storage.all(State)))
+
+        test_all_count = test_storage.count()
+        self.assertEqual(test_all_count, len(test_storage.all()))
