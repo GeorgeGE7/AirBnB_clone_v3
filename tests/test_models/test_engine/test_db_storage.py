@@ -23,6 +23,52 @@ classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
 
 
+class TestDBStorage(unittest.TestCase):
+    """Test all the FileStorage class"""
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_all_dictionaries(self):
+        """testing the dictionaries returned from storage
+        """
+        self.assertIs(type(models.storage.all()), dict)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_all_when_no_classes(self):
+        """testing when no classes"""
+        test_state_info = {"name": "Cairo"}
+        test_state = State(**test_state_info)
+        models.storage.new(test_state)
+        models.storage.save()
+        test_session = models.storage._DBStorage__session
+        all_objs = test_session.query(State).all()
+
+        self.assertTrue(len(all_objs) > 0)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_new(self):
+        """testing new data for class and storage"""
+        test_state_info = {"name": "Mokattam"}
+        test_state = State(**test_state_info)
+        models.storage.new(test_state)
+        test_session = models.storage._DBStorage__session
+        t_s_db = test_session.query(State).filter_by(id=test_state.id).first()
+
+        self.assertEqual(test_state.id, t_s_db.id)
+        self.assertEqual(test_state.name, t_s_db.name)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_save(self):
+        """testing save method with storage"""
+        test_state_info = {"name": "Mokattam"}
+        test_state = State(**test_state_info)
+        models.storage.new(test_state)
+        models.storage.save()
+        test_session = models.storage._DBStorage__session
+        t_s_db = test_session.query(State).filter_by(id=test_state.id).first()
+
+        self.assertEqual(test_state.id, t_s_db.id)
+        self.assertEqual(test_state.name, t_s_db.name)
+
+
 class TestDBStorageDocs(unittest.TestCase):
     """Tests to check the documentation and style of DBStorage class"""
     @classmethod
