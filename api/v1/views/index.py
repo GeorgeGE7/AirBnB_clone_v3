@@ -19,11 +19,11 @@ def get_stats_count():
     """method that gets states count
     """
     re_stats = {
-        "amenities": storage.count(Amenity),
-        "cities": storage.count(City),
-        "place": storage.count(Place),
-        "reviews": storage.count(Review),
-        "states": storage.count(State),
-        "users": storage.count(User)
+        "amenities": storage.count("Amenity"),
+        "cities": storage.count("City"),
+        "place": storage.count("Place"),
+        "reviews": storage.count("Review"),
+        "states": storage.count("State"),
+        "users": storage.count("User")
     }
     return jsonify(re_stats)
