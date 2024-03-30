@@ -67,7 +67,7 @@ def create_new_amenity():
         return abort(400, 'Not a JSON')
     all_kwargs = request.get_json()
     if 'name' not in all_kwargs:
-        abort(400, 'Missing name')
+        return abort(400, 'Missing name')
     new_amenity = amenity.Amenity(**all_kwargs)
     new_amenity.save()
     return jsonify(new_amenity.to_dict()), 201
