@@ -2,7 +2,7 @@
 """Creating Flask app instance, and returning it, with views
 """
 from os import getenv
-from flask import Flask
+from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
 
@@ -15,6 +15,12 @@ app.register_blueprint(app_views)
 def teardown_db(exception):
     """This method calls storage.close() at the end of each request"""
     storage.close()
+
+@app_views.errorhandler(404)
+def not_found_error_handler():
+    """This method for 404 error - Not found page"""   
+    res = {"error": "Not found"}
+    return jsonify(res), 404 
 
 
 if __name__ == "__main__":
