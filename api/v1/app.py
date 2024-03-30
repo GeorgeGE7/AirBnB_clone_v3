@@ -16,11 +16,12 @@ def teardown_db(exception):
     """This method calls storage.close() at the end of each request"""
     storage.close()
 
+
 @app.errorhandler(404)
 def not_found_error_handler(error):
-    """This method for 404 error - Not found page"""   
+    """This method for 404 error - Not found page"""
     res = {"error": "Not found"}
-    return jsonify(res), 404 
+    return jsonify(res), 404
 
 
 if __name__ == "__main__":

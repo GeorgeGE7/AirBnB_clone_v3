@@ -11,7 +11,7 @@ def get_states():
     """get all states or get single state if id is specified
     """
     all_states = storage.all(state.State).values()
-    all_states_list = [state.to_dict()  for state in all_states]
+    all_states_list = [state.to_dict() for state in all_states]
     return jsonify(all_states_list)
 
 
@@ -26,7 +26,8 @@ def get_states_by_id(state_id):
         return abort(404)
 
 
-@app_views.route('/states/<state_id>', methods=['DELETE'], strict_slashes=False)
+@app_views.route('/states/<state_id>', methods=['DELETE'],
+                 strict_slashes=False)
 def delete_states_by_id(state_id):
     """delete a state by a spacific id
     """
@@ -66,7 +67,7 @@ def update_state_by_id(state_id):
     existing_state = storage.get(state.State, state_id)
     if existing_state:
         if not request.get_json():
-          return abort(400, 'Not a JSON')
+            return abort(400, 'Not a JSON')
         new_data = request.get_json()
         ignored_keys = ['id', 'created_at', 'updated_at']
         for key, value in new_data.items():
