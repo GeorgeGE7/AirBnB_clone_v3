@@ -16,10 +16,8 @@ def get_places_by_city_id(city_id):
     city_by_id = storage.get(city.City, city_id)
     if not city_by_id:
         return abort(404)
-    city_places_list = []
-    for place in city_by_id.places:
-        city_places_list.append(place.to_dict())
-    return jsonify(city_places_list)
+    city_places = [place.to_dict() for place in city_by_id.places]
+    return jsonify(city_places)
 
 
 @app_views.route('/places/<place_id>', strict_slashes=False)
@@ -73,8 +71,7 @@ def create_place_by_city_id(city_id):
     all_kwargs = request.get_json()
     if 'user_id' not in all_kwargs:
         return abort(400, 'Missing user_id')
-    user = storage.get(user.User, all_kwargs['user_id'])
-    if not user or user is None:
+    if not storage.get(user.User, all_kwargs['user_id']):
         return abort(404)
     if 'name' not in all_kwargs:
         return abort(400, 'Missing name')
@@ -95,10 +92,10 @@ def update_place_by_id(place_id):
     """
     if request.content_type != 'application/json':
         return abort(400, 'Not a JSON')
-    if not request.get_json():
-        return abort(400, 'Not a JSON')
     existing_place = storage.get(place.Place, place_id)
     if existing_place:
+        if not request.get_json():
+            return abort(400, 'Not a JSON')
         new_data = request.get_json()
         ignored_keys = ['id', 'user_id', 'city_id', 'created_at', 'updated_at']
         for key, value in new_data.items():
