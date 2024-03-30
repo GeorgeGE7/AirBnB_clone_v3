@@ -10,11 +10,11 @@ from api.v1.views import app_views
 def get_status():
     """get the api status - json format
     """
-    res={"status": "OK"}
+    res = {"status": "OK"}
     return jsonify(res)
 
 
-app_views.route('/stats')
+@app_views.route('/stats')
 def get_stats_count():
     """method that gets states count
     """
