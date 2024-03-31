@@ -2,7 +2,7 @@
 """Cities routs and functions to get city/Cities data from the API
 """
 from flask import jsonify, abort, request
-from models import storage, place, city, user
+from models import storage, place, city, user, state, amenity
 from api.v1.views import app_views
 
 
@@ -16,7 +16,7 @@ def get_places_by_city_id(city_id):
     city_by_id = storage.get(city.City, city_id)
     if not city_by_id:
         return abort(404)
-    city_places = [place.to_dict() for place in city_by_id.places]
+    city_places = [place.to_dict() for place in city_by_id.places.values()]
     return jsonify(city_places)
 
 
@@ -105,3 +105,52 @@ def update_place_by_id(place_id):
         return jsonify(existing_place.to_dict()), 200
     else:
         return abort(404)
+
+
+@app_views.route('/places_search', strict_slashes=False)
+def serach_for_place():
+    """search for place route
+    """
+    if request.content_type != 'application/json':
+        return abort(400, 'Not a JSON')
+    if not request.get_json():
+        return abort(400, 'Not a JSON')
+    all_kwargs = request.get_json()
+    if all_kwargs:
+        user_input_s = all_kwargs.get('states')
+        user_input_c = all_kwargs.get('cities')
+        user_input_a = all_kwargs.get('amenities')
+    if not (user_input_a or user_input_c or user_input_s):
+        places_search = storage.all(place.Place).values()
+        p_s_list = [place_s.to_dict() for place_s in places_search]
+        return jsonify(p_s_list)
+    p_s_list = []
+    if user_input_s:
+        all_states = [storage.get(state.State, s_id) for s_id in user_input_s]
+        for sstate in all_states:
+            if sstate:
+                for scity in sstate.cities:
+                    if scity:
+                        for splace in scity.places:
+                            p_s_list.append(splace)
+    if user_input_c:
+        all_cities = [storage.get(city.City, c_id) for c_id in user_input_c]
+        for scity in all_cities:
+            if scity:
+                for splace in scity.places:
+                    if splace not in p_s_list:
+                        p_s_list.append(splace)
+
+    if user_input_a:
+        if not p_s_list:
+            all_places = storage.all(place.Place).values()
+            all_amies = [storage.get(amenity.Amenity) for am_id in user_input_a]
+            for splace in all_places:
+                if all(am in splace.amenities for am in all_amies):
+                    p_s_list.append(splace)
+    f_places = []
+    for spo in p_s_list:
+        spd = spo.to_dict()
+        spd.pop('amenities', None)
+        f_places.append(spd)
+    return jsonify(f_places)
