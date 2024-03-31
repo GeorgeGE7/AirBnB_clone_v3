@@ -69,7 +69,7 @@ def create_place_by_city_id(city_id):
     if not request.get_json():
         return abort(400, 'Not a JSON')
     all_kwargs = request.get_json()
-    if 'user_id' not in all_kwargs:
+    if 'user_id' not in all_kwargs.keys():
         return abort(400, 'Missing user_id')
     if not storage.get(user.User, all_kwargs['user_id']):
         return abort(404)
